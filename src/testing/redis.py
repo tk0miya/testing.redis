@@ -58,7 +58,6 @@ class Redis(object):
 
         redis_conf = self.settings.setdefault('redis_conf', {})
         redis_conf['bind'] = '127.0.0.1'
-        redis_conf['logfile'] = '/dev/null'
         redis_conf['dir'] = os.path.join(self.base_dir, 'data')
         redis_conf['dbfilename'] = 'dump.rdb'
 
