@@ -4,7 +4,7 @@ import os
 import sys
 import signal
 import testing.redis
-from redis import ConnectionPool, Redis
+from redis import Redis
 from time import sleep
 
 if sys.version_info < (2, 7):
@@ -13,17 +13,16 @@ else:
     import unittest
 
 
-class TestRedis(unittest.TestCase):
+class TestRedisServer(unittest.TestCase):
     def test_basic(self):
         # start redis server
-        redis = testing.redis.Redis()
+        redis = testing.redis.RedisServer()
         self.assertIsNotNone(redis)
         self.assertEqual(redis.dsn(),
                          dict(host='127.0.0.1', port=redis.port, db=0))
 
         # connect to redis
-        pool = ConnectionPool(**redis.dsn())
-        r = Redis(connection_pool=pool)
+        r = Redis(**redis.dsn())
         self.assertIsNotNone(r)
 
         # shutting down
@@ -40,7 +39,7 @@ class TestRedis(unittest.TestCase):
 
     def test_stop(self):
         # start redis server
-        redis = testing.redis.Redis()
+        redis = testing.redis.RedisServer()
         self.assertIsNotNone(redis.pid)
         self.assertTrue(os.path.exists(redis.base_dir))
         pid = redis.pid
@@ -64,12 +63,11 @@ class TestRedis(unittest.TestCase):
         del redis
 
     def test_with_redis(self):
-        with testing.redis.Redis() as redis:
+        with testing.redis.RedisServer() as redis:
             self.assertIsNotNone(redis)
 
             # connect to redis
-            pool = ConnectionPool(**redis.dsn())
-            r = Redis(connection_pool=pool)
+            r = Redis(**redis.dsn())
             self.assertIsNotNone(r)
 
             pid = redis.pid
@@ -80,8 +78,8 @@ class TestRedis(unittest.TestCase):
             os.kill(pid, 0)  # process is down
 
     def test_multiple_redis(self):
-        redis1 = testing.redis.Redis()
-        redis2 = testing.redis.Redis()
+        redis1 = testing.redis.RedisServer()
+        redis2 = testing.redis.RedisServer()
         self.assertNotEqual(redis1.pid, redis2.pid)
 
         os.kill(redis1.pid, 0)  # process is alive
@@ -93,12 +91,12 @@ class TestRedis(unittest.TestCase):
             os.environ['PATH'] = '/usr/bin'
 
             with self.assertRaises(RuntimeError):
-                testing.redis.Redis()
+                testing.redis.RedisServer()
         finally:
             os.environ['PATH'] = path
 
     def test_fork(self):
-        redis = testing.redis.Redis()
+        redis = testing.redis.RedisServer()
         if os.fork() == 0:
             del redis
             redis = None
@@ -110,7 +108,7 @@ class TestRedis(unittest.TestCase):
             os.kill(redis.pid, 0)  # process is alive (delete mysqld obj in child does not effect)
 
     def test_stop_on_child_process(self):
-        redis = testing.redis.Redis()
+        redis = testing.redis.RedisServer()
         if os.fork() == 0:
             redis.stop()
             self.assertTrue(redis.pid)
@@ -124,11 +122,10 @@ class TestRedis(unittest.TestCase):
 
     def test_copy_data_from(self):
         data_dir = os.path.join(os.path.dirname(__file__), 'copy-data-from')
-        redis = testing.redis.Redis(copy_data_from=data_dir)
+        redis = testing.redis.RedisServer(copy_data_from=data_dir)
 
         # connect to mysql
-        pool = ConnectionPool(**redis.dsn())
-        r = Redis(connection_pool=pool)
+        r = Redis(**redis.dsn())
 
         self.assertEqual('1', r.get('scott'))
         self.assertEqual('2', r.get('tiger'))
@@ -153,7 +150,7 @@ class TestRedis(unittest.TestCase):
             self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
             self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
             self.assertEqual(True, testcase.__unittest_skip__)
-            self.assertEqual("Redis does not found", testcase.__unittest_skip_why__)
+            self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
         finally:
             os.environ['PATH'] = path
 
@@ -175,7 +172,7 @@ class TestRedis(unittest.TestCase):
         self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
         self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
         self.assertEqual(True, testcase.__unittest_skip__)
-        self.assertEqual("Redis does not found", testcase.__unittest_skip_why__)
+        self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
 
     def test_skipIfNotFound_found(self):
         @testing.redis.skipIfNotFound
@@ -197,6 +194,6 @@ class TestRedis(unittest.TestCase):
             self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
             self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
             self.assertEqual(True, testcase.__unittest_skip__)
-            self.assertEqual("Redis does not found", testcase.__unittest_skip_why__)
+            self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
         finally:
             os.environ['PATH'] = path

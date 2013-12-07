@@ -11,13 +11,13 @@ And ``testing.redis`` requires Redis server.
 
 Usage
 =====
-Create Redis instance using ``testing.redis.Redis``::
+Create Redis instance using ``testing.redis.RedisServer``::
 
   import redis
   import testing.redis
 
   # Launch new Redis server
-  with testing.redis.Redis as redis_server:
+  with testing.redis.RedisServer as redis_server:
       r = redis.Redis(**redis_server.dsn())
       #
       # do any tests using Redis...
@@ -29,23 +29,23 @@ Create Redis instance using ``testing.redis.Redis``::
 ``testing.redis`` automatically searchs for redis-server from ``$PATH``.
 If you install redis to other directory, set ``redis_server`` keyword::
 
-  redis = testing.redis.Redis(redis_server='/path/to/your/redis-server')
+  redis = testing.redis.RedisServer(redis_server='/path/to/your/redis-server')
 
 
-``testing.redis.Redis`` executes ``redis-server`` on instantiation.
-On deleting Redis object, it terminates Redis instance and removes temporary directory.
+``testing.redis.RedisServer`` executes ``redis-server`` on instantiation.
+On deleting RedisServer object, it terminates Redis instance and removes temporary directory.
 
 If you want a database including any fixtures for your apps,
 use ``copy_data_from`` keyword::
 
   # uses a copy of specified data directory of Redis.
-  redis = testing.redis.Redis(copy_data_from='/path/to/your/database')
+  redis = testing.redis.RedisServer(copy_data_from='/path/to/your/database')
 
 
 You can specify parameters for Redis with ``redis_conf`` keyword::
 
   # Enable appendonly mode
-  redis = testing.redis.Redis(redis_conf={'appendonly': 'yes'})
+  redis = testing.redis.RedisServer(redis_conf={'appendonly': 'yes'})
 
 
 For example, you can setup new Redis server for each testcases on setUp() method::
@@ -55,7 +55,7 @@ For example, you can setup new Redis server for each testcases on setUp() method
 
   class MyTestCase(unittest.TestCase):
       def setUp(self):
-          self.redis = testing.redis.Redis()
+          self.redis = testing.redis.RedisServer()
 
       def tearDown(self):
           self.redis.stop()

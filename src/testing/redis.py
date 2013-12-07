@@ -23,7 +23,7 @@ import tempfile
 import subprocess
 from time import sleep
 from shutil import copytree
-from redis import StrictRedis
+from redis import Redis
 
 __all__ = ['Redis', 'skipIfNotInstalled', 'skipIfNotFound']
 
@@ -34,7 +34,7 @@ DEFAULT_SETTINGS = dict(auto_start=2,
                         copy_data_from=None)
 
 
-class Redis(object):
+class RedisServer(object):
     def __init__(self, **kwargs):
         self.settings = dict(DEFAULT_SETTINGS)
         self.settings.update(kwargs)
@@ -86,7 +86,7 @@ class Redis(object):
         if name in self.settings:
             return self.settings[name]
         else:
-            raise AttributeError("'Redis' object has no attribute '%s'" % name)
+            raise AttributeError("'RedisServer' object has no attribute '%s'" % name)
 
     @property
     def pid_file(self):
@@ -154,7 +154,7 @@ class Redis(object):
 
             while True:
                 try:
-                    r = StrictRedis(**self.dsn())
+                    r = Redis(**self.dsn())
                     r.execute_command('QUIT')
                     break
                 except:
@@ -225,7 +225,7 @@ def skipIfNotInstalled(arg=None):
             else:
                 cond = True
 
-        return skipIf(cond, "Redis does not found")(fn)
+        return skipIf(cond, "redis-server does not found")(fn)
 
     if callable(arg):  # execute as simple decorator
         return decorator(arg, None)
