@@ -13,12 +13,12 @@ Usage
 =====
 Create Redis instance using ``testing.redis.Redis``::
 
-  import pycassa
+  import redis
   import testing.redis
 
   # Launch new Redis server
-  with testing.redis.Redis as redis:
-      conn = pycassa.pool.ConnectionPool('test', redis.server_list())
+  with testing.redis.Redis as redis_server:
+      r = redis.Redis(**redis_server.dsn())
       #
       # do any tests using Redis...
       #
@@ -26,27 +26,26 @@ Create Redis instance using ``testing.redis.Redis``::
   # Redis server is terminated here
 
 
-``testing.redis`` automatically searchs for redis files in ``/usr/local/``.
-If you install redis to other directory, set ``redis_home`` keyword::
+``testing.redis`` automatically searchs for redis-server from ``$PATH``.
+If you install redis to other directory, set ``redis_server`` keyword::
 
-  # uses a copy of specified data directory of Redis.
-  redis = testing.redis.Redis(copy_data_from='/path/to/your/database')
+  redis = testing.redis.Redis(redis_server='/path/to/your/redis-server')
 
 
-``testing.redis.Redis`` executes ``redis`` on instantiation.
+``testing.redis.Redis`` executes ``redis-server`` on instantiation.
 On deleting Redis object, it terminates Redis instance and removes temporary directory.
 
-If you want a database including column families and any fixtures for your apps,
+If you want a database including any fixtures for your apps,
 use ``copy_data_from`` keyword::
 
   # uses a copy of specified data directory of Redis.
   redis = testing.redis.Redis(copy_data_from='/path/to/your/database')
 
 
-You can specify parameters for Redis with ``redis_yaml`` keyword::
+You can specify parameters for Redis with ``redis_conf`` keyword::
 
-  # boot Redis server listens on 12345 port
-  redis = testing.redis.Redis(redis_yaml={'rpc_port': 12345})
+  # Enable appendonly mode
+  redis = testing.redis.Redis(redis_conf={'appendonly': 'yes'})
 
 
 For example, you can setup new Redis server for each testcases on setUp() method::
@@ -65,8 +64,7 @@ For example, you can setup new Redis server for each testcases on setUp() method
 Requirements
 ============
 * Python 2.6, 2.7
-* pycassa
-* PyYAML
+* redis
 
 
 License
@@ -77,6 +75,6 @@ Apache License 2.0
 History
 =======
 
-1.0.0 (2013-10-17)
+1.0.0 (2013-12-07)
 -------------------
 * First release
