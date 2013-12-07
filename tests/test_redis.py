@@ -125,8 +125,8 @@ class TestRedisServer(unittest.TestCase):
         # connect to mysql
         r = Redis(**redis.dsn())
 
-        self.assertEqual('1', r.get('scott'))
-        self.assertEqual('2', r.get('tiger'))
+        self.assertEqual('1', r.get('scott').decode('utf-8'))
+        self.assertEqual('2', r.get('tiger').decode('utf-8'))
 
     def test_skipIfNotInstalled_found(self):
         @testing.redis.skipIfNotInstalled
