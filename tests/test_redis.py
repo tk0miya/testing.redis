@@ -4,6 +4,7 @@ import os
 import sys
 import signal
 import testing.redis
+from mock import patch
 from redis import Redis
 from time import sleep
 
@@ -85,15 +86,12 @@ class TestRedisServer(unittest.TestCase):
         os.kill(redis1.pid, 0)  # process is alive
         os.kill(redis2.pid, 0)  # process is alive
 
-    def test_redis_is_not_found(self):
-        try:
-            path = os.environ['PATH']
-            os.environ['PATH'] = '/usr/bin'
+    @patch("testing.redis.get_path_of")
+    def test_redis_is_not_found(self, get_path_of):
+        get_path_of.return_value = None
 
-            with self.assertRaises(RuntimeError):
-                testing.redis.RedisServer()
-        finally:
-            os.environ['PATH'] = path
+        with self.assertRaises(RuntimeError):
+            testing.redis.RedisServer()
 
     def test_fork(self):
         redis = testing.redis.RedisServer()
@@ -138,21 +136,18 @@ class TestRedisServer(unittest.TestCase):
         self.assertEqual(False, hasattr(testcase, '__unittest_skip__'))
         self.assertEqual(False, hasattr(testcase, '__unittest_skip_why__'))
 
-    def test_skipIfNotInstalled_notfound(self):
-        try:
-            path = os.environ['PATH']
-            os.environ['PATH'] = '/usr/bin'
+    @patch("testing.redis.get_path_of")
+    def test_skipIfNotInstalled_notfound(self, get_path_of):
+        get_path_of.return_value = None
 
-            @testing.redis.skipIfNotInstalled
-            def testcase():
-                pass
+        @testing.redis.skipIfNotInstalled
+        def testcase():
+            pass
 
-            self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
-            self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
-            self.assertEqual(True, testcase.__unittest_skip__)
-            self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
-        finally:
-            os.environ['PATH'] = path
+        self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
+        self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
+        self.assertEqual(True, testcase.__unittest_skip__)
+        self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
 
     def test_skipIfNotInstalled_with_args_found(self):
         redis_server = testing.redis.get_path_of('redis-server')
@@ -182,18 +177,15 @@ class TestRedisServer(unittest.TestCase):
         self.assertEqual(False, hasattr(testcase, '__unittest_skip__'))
         self.assertEqual(False, hasattr(testcase, '__unittest_skip_why__'))
 
-    def test_skipIfNotFound_notfound(self):
-        try:
-            path = os.environ['PATH']
-            os.environ['PATH'] = '/usr/bin'
+    @patch("testing.redis.get_path_of")
+    def test_skipIfNotFound_notfound(self, get_path_of):
+        get_path_of.return_value = None
 
-            @testing.redis.skipIfNotFound
-            def testcase():
-                pass
+        @testing.redis.skipIfNotFound
+        def testcase():
+            pass
 
-            self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
-            self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
-            self.assertEqual(True, testcase.__unittest_skip__)
-            self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
-        finally:
-            os.environ['PATH'] = path
+        self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
+        self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
+        self.assertEqual(True, testcase.__unittest_skip__)
+        self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
