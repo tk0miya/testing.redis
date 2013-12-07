@@ -39,7 +39,6 @@ class RedisServer(object):
         self.settings = dict(DEFAULT_SETTINGS)
         self.settings.update(kwargs)
         self.pid = None
-        self.port = None
         self._owner_pid = os.getpid()
         self._use_tmpdir = False
 
@@ -60,9 +59,6 @@ class RedisServer(object):
         redis_conf['bind'] = '127.0.0.1'
         redis_conf['dir'] = os.path.join(self.base_dir, 'data')
         redis_conf['dbfilename'] = 'dump.rdb'
-
-        if 'port' in redis_conf:
-            self.port = redis_conf['port']
 
         if self.auto_start:
             if os.path.exists(self.pid_file):
@@ -95,7 +91,7 @@ class RedisServer(object):
     def dsn(self, **kwargs):
         params = dict(kwargs)
         params.setdefault('host', self.redis_conf['bind'])
-        params.setdefault('port', self.port)
+        params.setdefault('port', self.redis_conf['port'])
         params.setdefault('db', 0)
 
         return params
@@ -118,6 +114,10 @@ class RedisServer(object):
             except:
                 pass
 
+    def prestart(self):
+        if 'port' not in self.redis_conf:
+            self.redis_conf['port'] = get_unused_port()
+
         # write redis.conf
         with open(os.path.join(self.base_dir, 'redis.conf'), 'w') as conf:
             for key, value in self.redis_conf.items():
@@ -127,10 +127,7 @@ class RedisServer(object):
         if self.pid:
             return  # already started
 
-        if 'port' in self.redis_conf:
-            self.port = None
-        else:
-            self.port = get_unused_port()
+        self.prestart()
 
         logger = open(os.path.join(self.base_dir, 'tmp', 'redis.log'), 'wt')
         pid = os.fork()
@@ -142,11 +139,8 @@ class RedisServer(object):
                 with open(self.pid_file, 'wt') as fd:
                     fd.write(str(pid))
 
-                args = [os.path.join(self.base_dir, 'redis.conf')]
-                if self.port:
-                    args += ['--port', str(self.port)]
-
-                os.execl(self.redis_server, self.redis_server, *args)
+                os.execl(self.redis_server, self.redis_server,
+                         os.path.join(self.base_dir, 'redis.conf'))
             except Exception as exc:
                 raise RuntimeError('failed to launch redis: %r' % exc)
         else:
