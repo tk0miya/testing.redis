@@ -40,7 +40,7 @@ setup(
     include_package_data=True,
     install_requires=install_requires,
     extras_require=dict(
-        test=[
+        testing=[
             'mock',
             'nose',
         ],
