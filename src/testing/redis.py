@@ -22,7 +22,7 @@ import socket
 import tempfile
 import subprocess
 from time import sleep
-from shutil import copytree
+from shutil import copytree, rmtree
 from redis import Redis
 
 __all__ = ['Redis', 'skipIfNotInstalled', 'skipIfNotFound']
@@ -167,7 +167,6 @@ class RedisServer(object):
             self.cleanup()
 
     def terminate(self, _signal=signal.SIGTERM):
-        import os
         if self.pid is None:
             return  # not started
 
@@ -192,7 +191,6 @@ class RedisServer(object):
         if self.pid is not None:
             return
 
-        from shutil import rmtree
         if self._use_tmpdir and os.path.exists(self.base_dir):
             rmtree(self.base_dir)
 
