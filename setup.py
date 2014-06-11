@@ -25,7 +25,7 @@ if sys.version_info < (2, 7):
 
 setup(
     name='testing.redis',
-    version='1.0.0',
+    version='1.0.1',
     description='automatically setups a redis instance in a temporary directory, and destroys it after testing',
     long_description=open('README.rst').read(),
     classifiers=classifiers,

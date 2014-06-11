@@ -87,6 +87,10 @@ Apache License 2.0
 History
 =======
 
+1.0.1 (2014-06-11)
+-------------------
+* Fix ImportError if caught SIGINT on py3
+
 1.0.0 (2013-12-07)
 -------------------
 * First release
