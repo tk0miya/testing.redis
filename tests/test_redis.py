@@ -125,7 +125,7 @@ class TestRedisServer(unittest.TestCase):
             tmpdir = tempfile.mkdtemp()
 
             # create new database
-            with testing.redis.RedisServer(base_dir=tmpdir) as redis:
+            with testing.redis.RedisServer(base_dir=tmpdir, redis_conf={'save': '900 1'}) as redis:
                 r = Redis(**redis.dsn())
                 r.set('scott', '1')
                 r.set('tiger', '2')
