@@ -132,7 +132,7 @@ class TestRedisServer(unittest.TestCase):
 
             # create another database from first one
             data_dir = os.path.join(tmpdir, 'data')
-            with testing.redis.Redis(copy_data_from=data_dir) as redis:
+            with testing.redis.RedisServer(copy_data_from=data_dir) as redis:
                 r = Redis(**redis.dsn())
 
                 self.assertEqual('1', r.get('scott').decode('utf-8'))
