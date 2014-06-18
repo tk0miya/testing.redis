@@ -192,7 +192,7 @@ class RedisServer(object):
             return
 
         if self._use_tmpdir and os.path.exists(self.base_dir):
-            rmtree(self.base_dir)
+            rmtree(self.base_dir, ignore_errors=True)
 
     def read_log(self):
         try:
