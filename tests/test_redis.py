@@ -3,10 +3,12 @@
 import os
 import sys
 import signal
+import tempfile
 import testing.redis
 from mock import patch
 from redis import Redis
 from time import sleep
+from shutil import rmtree
 
 if sys.version_info < (2, 7):
     import unittest2 as unittest
@@ -119,14 +121,24 @@ class TestRedisServer(unittest.TestCase):
             os.kill(redis.pid, 0)  # process is alive (calling stop() in child is ignored)
 
     def test_copy_data_from(self):
-        data_dir = os.path.join(os.path.dirname(__file__), 'copy-data-from')
-        redis = testing.redis.RedisServer(copy_data_from=data_dir)
+        try:
+            tmpdir = tempfile.mkdtemp()
 
-        # connect to mysql
-        r = Redis(**redis.dsn())
+            # create new database
+            with testing.redis.RedisServer(base_dir=tmpdir) as redis:
+                r = Redis(**redis.dsn())
+                r.set('scott', '1')
+                r.set('tiger', '2')
 
-        self.assertEqual('1', r.get('scott').decode('utf-8'))
-        self.assertEqual('2', r.get('tiger').decode('utf-8'))
+            # create another database from first one
+            data_dir = os.path.join(tmpdir, 'data')
+            with testing.redis.Redis(copy_data_from=data_dir) as redis:
+                r = Redis(**redis.dsn())
+
+                self.assertEqual('1', r.get('scott').decode('utf-8'))
+                self.assertEqual('2', r.get('tiger').decode('utf-8'))
+        finally:
+            rmtree(tmpdir)
 
     def test_skipIfNotInstalled_found(self):
         @testing.redis.skipIfNotInstalled
