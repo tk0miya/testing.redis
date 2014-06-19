@@ -223,7 +223,7 @@ def skipIfNotInstalled(arg=None):
             else:
                 cond = True
 
-        return skipIf(cond, "redis-server does not found")(fn)
+        return skipIf(cond, "redis-server not found")(fn)
 
     if callable(arg):  # execute as simple decorator
         return decorator(arg, None)

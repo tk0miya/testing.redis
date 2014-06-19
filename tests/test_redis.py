@@ -159,7 +159,7 @@ class TestRedisServer(unittest.TestCase):
         self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
         self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
         self.assertEqual(True, testcase.__unittest_skip__)
-        self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
+        self.assertEqual("redis-server not found", testcase.__unittest_skip_why__)
 
     def test_skipIfNotInstalled_with_args_found(self):
         redis_server = testing.redis.get_path_of('redis-server')
@@ -179,7 +179,7 @@ class TestRedisServer(unittest.TestCase):
         self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
         self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
         self.assertEqual(True, testcase.__unittest_skip__)
-        self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
+        self.assertEqual("redis-server not found", testcase.__unittest_skip_why__)
 
     def test_skipIfNotFound_found(self):
         @testing.redis.skipIfNotFound
@@ -200,4 +200,4 @@ class TestRedisServer(unittest.TestCase):
         self.assertEqual(True, hasattr(testcase, '__unittest_skip__'))
         self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
         self.assertEqual(True, testcase.__unittest_skip__)
-        self.assertEqual("redis-server does not found", testcase.__unittest_skip_why__)
+        self.assertEqual("redis-server not found", testcase.__unittest_skip_why__)
