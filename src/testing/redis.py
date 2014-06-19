@@ -155,7 +155,7 @@ class RedisServer(object):
                 except:
                     pass
 
-                if os.waitpid(pid, os.WNOHANG) != (0, 0):
+                if os.waitpid(pid, os.WNOHANG)[0] != 0:
                     raise RuntimeError("*** failed to launch redis ***\n" + self.read_log())
 
                 sleep(1)
