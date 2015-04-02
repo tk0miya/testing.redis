@@ -163,9 +163,8 @@ class RedisServer(object):
             self.pid = pid
 
     def stop(self, _signal=signal.SIGTERM):
-        if self._owner_pid == os.getpid():
-            self.terminate(_signal)
-            self.cleanup()
+        self.terminate(_signal)
+        self.cleanup()
 
     def terminate(self, _signal=signal.SIGTERM):
         if self.pid is None:
