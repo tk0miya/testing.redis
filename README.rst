@@ -87,6 +87,13 @@ Apache License 2.0
 History
 =======
 
+1.0.3 (2015-04-06)
+-------------------
+* Fix bugs:
+
+  - Do not call os.getpid() on destructor (if not needed)
+  - Use absolute path for which command
+
 1.0.2 (2014-06-19)
 -------------------
 * Add timeout on terminating redis-server
