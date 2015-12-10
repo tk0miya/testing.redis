@@ -1,16 +1,13 @@
 ``testing.redis`` automatically setups a redis instance in a temporary directory, and destroys it after testing
 
-.. image:: https://drone.io/bitbucket.org/tk0miya/testing.redis/status.png
-   :target: https://drone.io/bitbucket.org/tk0miya/testing.redis
-   :alt: drone.io CI build status
+.. image:: https://travis-ci.org/tk0miya/testing.redis.svg?branch=master
+   :target: https://travis-ci.org/tk0miya/testing.redis
 
-.. image:: https://pypip.in/v/testing.redis/badge.png
-   :target: https://pypi.python.org/pypi/testing.redis/
-   :alt: Latest PyPI version
+.. image:: https://coveralls.io/repos/tk0miya/testing.redis/badge.png?branch=master
+   :target: https://coveralls.io/r/tk0miya/testing.redis?branch=master
 
-.. image:: https://pypip.in/d/testing.redis/badge.png
-   :target: https://pypi.python.org/pypi/testing.redis/
-   :alt: Number of PyPI downloads
+.. image:: https://codeclimate.com/github/tk0miya/testing.redis/badges/gpa.svg
+   :target: https://codeclimate.com/github/tk0miya/testing.redis
 
 Install
 =======
