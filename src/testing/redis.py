@@ -147,6 +147,7 @@ class RedisServer(object):
         else:
             logger.close()
 
+            exec_at = datetime.now()
             while True:
                 try:
                     r = Redis(**self.dsn())
@@ -158,7 +159,10 @@ class RedisServer(object):
                 if os.waitpid(pid, os.WNOHANG)[0] != 0:
                     raise RuntimeError("*** failed to launch redis ***\n" + self.read_log())
 
-                sleep(1)
+                if (datetime.now() - exec_at).seconds > 10.0:
+                    raise RuntimeError("*** failed to launch postgres (timeout) ***\n" + self.read_log())
+
+                sleep(0.1)
 
             self.pid = pid
 
