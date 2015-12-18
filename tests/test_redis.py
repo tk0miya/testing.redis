@@ -201,3 +201,32 @@ class TestRedisServer(unittest.TestCase):
         self.assertEqual(True, hasattr(testcase, '__unittest_skip_why__'))
         self.assertEqual(True, testcase.__unittest_skip__)
         self.assertEqual("redis-server not found", testcase.__unittest_skip_why__)
+
+    def test_RedisServerFactory(self):
+        RedisServer = testing.redis.RedisServerFactory(cache_initialized_db=True)
+        with RedisServer() as pgsql1:
+            self.assertTrue(pgsql1.settings['copy_data_from'])
+            copy_data_from1 = pgsql1.settings['copy_data_from']
+            self.assertTrue(os.path.exists(copy_data_from1))
+        with RedisServer() as pgsql2:
+            self.assertEqual(copy_data_from1, pgsql2.settings['copy_data_from'])
+        RedisServer.clear_cache()
+        self.assertFalse(os.path.exists(copy_data_from1))
+
+    def test_RedisServerFactory_with_initialized_handler(self):
+        def handler(redis):
+            r = Redis(**redis.dsn())
+            r.config_set('save', '900 1')
+            r.set('scott', '1')
+            r.set('tiger', '2')
+
+        RedisServer = testing.redis.RedisServerFactory(cache_initialized_db=True,
+                                                       on_initialized=handler)
+        try:
+            with RedisServer() as redis:
+                r = Redis(**redis.dsn())
+
+                self.assertEqual('1', r.get('scott').decode('utf-8'))
+                self.assertEqual('2', r.get('tiger').decode('utf-8'))
+        finally:
+            RedisServer.clear_cache()

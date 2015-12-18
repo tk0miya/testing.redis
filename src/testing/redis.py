@@ -19,7 +19,7 @@ import os
 from redis import Redis
 
 from testing.common.database import (
-    Database, SkipIfNotInstalledDecorator, get_path_of
+    Database, DatabaseFactory, SkipIfNotInstalledDecorator, get_path_of
 )
 
 __all__ = ['Redis', 'skipIfNotInstalled', 'skipIfNotFound']
@@ -79,6 +79,10 @@ class RedisServer(Database):
             return True
         except:
             return False
+
+
+class RedisServerFactory(DatabaseFactory):
+    target_class = RedisServer
 
 
 class RedisServerSkipIfNotInstalledDecorator(SkipIfNotInstalledDecorator):
