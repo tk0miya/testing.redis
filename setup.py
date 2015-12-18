@@ -19,6 +19,7 @@ classifiers = [
 ]
 
 install_requires = [
+    'testing.common.database',
     'redis',
 ]
 if sys.version_info < (2, 7):
@@ -52,4 +53,5 @@ setup(
         'mock',
         'nose',
     ],
+    namespace_packages=['testing'],
 )
