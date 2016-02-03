@@ -84,6 +84,12 @@ Apache License 2.0
 History
 =======
 
+1.1.0 (2016-02-03)
+-------------------
+* Add timeout to server invoker
+* Add testing.redis.RedisServerFactory
+* Depend on ``testing.common.database`` package
+
 1.0.3 (2015-04-06)
 -------------------
 * Fix bugs:
