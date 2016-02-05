@@ -28,39 +28,32 @@ class TestRedisServer(unittest.TestCase):
         r = Redis(**redis.dsn())
         self.assertIsNotNone(r)
 
-        # shutting down
-        pid = redis.pid
-        self.assertTrue(pid)
-        os.kill(pid, 0)  # process is alive
+        pid = redis.server_pid
+        self.assertTrue(redis.is_alive())
 
+        # shutting down
         redis.stop()
         sleep(1)
 
-        self.assertIsNone(redis.pid)
+        self.assertFalse(redis.is_alive())
         with self.assertRaises(OSError):
             os.kill(pid, 0)  # process is down
 
     def test_stop(self):
         # start redis server
         redis = testing.redis.RedisServer()
-        self.assertIsNotNone(redis.pid)
         self.assertTrue(os.path.exists(redis.base_dir))
-        pid = redis.pid
-        os.kill(pid, 0)  # process is alive
+        self.assertTrue(redis.is_alive())  # process is alive
 
         # call stop()
         redis.stop()
-        self.assertIsNone(redis.pid)
         self.assertFalse(os.path.exists(redis.base_dir))
-        with self.assertRaises(OSError):
-            os.kill(pid, 0)  # process is down
+        self.assertFalse(redis.is_alive())  # process is down
 
         # call stop() again
         redis.stop()
-        self.assertIsNone(redis.pid)
         self.assertFalse(os.path.exists(redis.base_dir))
-        with self.assertRaises(OSError):
-            os.kill(pid, 0)  # process is down
+        self.assertFalse(redis.is_alive())  # process is down
 
         # delete redis object after stop()
         del redis
@@ -73,20 +66,17 @@ class TestRedisServer(unittest.TestCase):
             r = Redis(**redis.dsn())
             self.assertIsNotNone(r)
 
-            pid = redis.pid
-            os.kill(pid, 0)  # process is alive
+            self.assertTrue(redis.is_alive())  # process is alive
 
-        self.assertIsNone(redis.pid)
-        with self.assertRaises(OSError):
-            os.kill(pid, 0)  # process is down
+        self.assertFalse(redis.is_alive())  # process is down
 
     def test_multiple_redis(self):
         redis1 = testing.redis.RedisServer()
         redis2 = testing.redis.RedisServer()
-        self.assertNotEqual(redis1.pid, redis2.pid)
+        self.assertNotEqual(redis1.server_pid, redis2.server_pid)
 
-        os.kill(redis1.pid, 0)  # process is alive
-        os.kill(redis2.pid, 0)  # process is alive
+        self.assertTrue(redis1.is_alive())  # process is alive
+        self.assertTrue(redis2.is_alive())  # process is alive
 
     @patch("testing.redis.get_path_of")
     def test_redis_is_not_found(self, get_path_of):
@@ -104,21 +94,18 @@ class TestRedisServer(unittest.TestCase):
         else:
             os.wait()
             sleep(1)
-            self.assertTrue(redis.pid)
-            os.kill(redis.pid, 0)  # process is alive (delete mysqld obj in child does not effect)
+            self.assertTrue(redis.is_alive())  # process is alive (delete mysqld obj in child does not effect)
 
     def test_stop_on_child_process(self):
         redis = testing.redis.RedisServer()
         if os.fork() == 0:
             redis.stop()
-            self.assertTrue(redis.pid)
-            os.kill(redis.pid, 0)  # process is alive (calling stop() is ignored)
+            os.kill(redis.server_pid, 0)  # process is alive (calling stop() is ignored)
             os.kill(os.getpid(), signal.SIGTERM)  # exit tests FORCELY
         else:
             os.wait()
             sleep(1)
-            self.assertTrue(redis.pid)
-            os.kill(redis.pid, 0)  # process is alive (calling stop() in child is ignored)
+            self.assertTrue(redis.is_alive())  # process is alive (delete mysqld obj in child does not effect)
 
     def test_copy_data_from(self):
         try:

@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 install_requires = [
-    'testing.common.database',
+    'testing.common.database >= 1.1.0',
     'redis',
 ]
 if sys.version_info < (2, 7):
