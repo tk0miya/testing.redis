@@ -26,7 +26,7 @@ Create Redis instance using ``testing.redis.RedisServer``::
   import testing.redis
 
   # Launch new Redis server
-  with testing.redis.RedisServer as redis_server:
+  with testing.redis.RedisServer() as redis_server:
       r = redis.Redis(**redis_server.dsn())
       #
       # do any tests using Redis...
