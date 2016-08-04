@@ -35,7 +35,7 @@ class RedisServer(Database):
     subdirectories = ['data', 'tmp']
 
     def initialize(self):
-        self.redis_server = self.settings.get('redi_server')
+        self.redis_server = self.settings.get('redis_server')
         if self.redis_server is None:
             self.redis_server = get_path_of('redis-server')
 
