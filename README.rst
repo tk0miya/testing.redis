@@ -84,6 +84,12 @@ Apache License 2.0
 History
 =======
 
+1.1.1 (2016-08-20)
+-------------------
+* Fix a bug
+
+  - #1 Fix parameter handling
+
 1.1.0 (2016-02-03)
 -------------------
 * Add timeout to server invoker
